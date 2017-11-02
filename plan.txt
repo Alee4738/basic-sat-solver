@@ -1,0 +1,23 @@
+CS 161 HW 4 Plan
+
+
+
+DOING:
+	Write goal test function
+		Given a sat problem and a variable assignment, check to see whether that variable assignment solves the sat problem
+		
+	Make test cases
+
+
+
+TODO:
+	
+	
+	We have 2 options: search, infer
+	Goal method:
+		Backtracking search using Most constrained variable and forward checking and variable ordering
+		TODO: How do I do variable ordering?
+
+DONE
+
+
