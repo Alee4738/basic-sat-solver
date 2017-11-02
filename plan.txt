@@ -3,15 +3,21 @@ CS 161 HW 4 Plan
 
 
 DOING:
-	
-
 	Make test cases
 
 
 
 TODO:
-	
-	
+	a state is a list of variable assignments!
+	variables: x1 x2 ... xn
+	domain: {t, f}, negative or positive
+	constraints: constraints
+
+	the notion of an initial state: 
+		empty variable assignment should not 
+
+
+
 	We have 2 options: search, infer
 	Goal method:
 		Backtracking search using Most constrained variable and forward checking and variable ordering

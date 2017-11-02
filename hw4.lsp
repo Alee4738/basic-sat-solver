@@ -49,3 +49,92 @@
 
 
 
+;; model for backtracking search provided in textbook
+
+
+; select-unassigned-variable helper
+; listFromTo (start end)
+; @param start - integer for the first number in list
+; @param end - integer for the last number in list
+; @return a list of integers from start to end (inclusive)
+(defun listFromTo (start end)
+  (cond 
+    ((> start end) nil)
+    ((= start end) (list end))
+    (t (cons start (listFromTo (+ start 1) end)))
+    );end cond
+  );end defun
+
+(defun flipSign (num)
+  (* -1 num)
+  );end defun
+
+; select-unasssigned-variable helper
+; nextUnassigned (assignment allNums)
+; @param assignment - a list of integers (variable assignment)
+; @param allNums - a list of positive integers (all the integers that should be assigned)
+; @return an integer not yet assigned in assignment
+;   else if all integers were assigned, nil
+(defun nextUnassigned (assignment allNums)
+  (if (null allNums) nil
+    (if (and (= (count (car allNums) assignment) 0)
+            (= (count (flipSign (car allNums)) assignment) 0)) (car allNums)
+      (nextUnassigned assignment (cdr allNums)))
+    );end if
+  );end defun
+
+; backtrack helper
+; select-unassigned-variable (assignment csp)
+; @param assignment - a list of integers (variable assignment)
+; @param csp - CNF
+; @return a (positive) integer not yet assigned in assignment
+(defun select-unassigned-variable (assignment csp)
+  (nextUnassigned assignment (listFromTo 1 (car csp)))
+  );end defun
+
+
+; backtrack helper
+; complete-assignment (assignment csp)
+; @param assignment - a list of integers (variable assignment)
+; @param csp - CNF
+; @return t if assignment is a complete assignment, else nil
+(defun complete-assignment (assignment csp)
+  (= (length assignment) (car csp))
+  );end defun
+
+; 
+; backtrack (assignment csp)
+(defun backtrack (assignment csp)
+  (if (complete-assignment assignment csp) assignment
+    (let* ((var (select-unassigned-variable assignment csp)))
+      ; try positive first, then negative
+      (cons var assignment)
+      (cons (flipSign var) assignment)
+
+
+
+      );end let
+    );end if
+  );end defun
+
+
+
+; functions to implement
+
+
+
+
+
+
+
+
+;
+; sat? (n delta)
+; @param n - an integer
+; @param delta - CNF defined over n variables
+; @return a list of n integers, representing a model of delta, 
+;   if delta is satisfiable, otherwise it returns NIL
+(defun sat? (n delta)
+  (backtrack '() (list n delta))
+  );end defun
+
