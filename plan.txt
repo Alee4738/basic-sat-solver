@@ -3,9 +3,8 @@ CS 161 HW 4 Plan
 
 
 DOING:
-	Write goal test function
-		Given a sat problem and a variable assignment, check to see whether that variable assignment solves the sat problem
-		
+	
+
 	Make test cases
 
 
@@ -19,5 +18,5 @@ TODO:
 		TODO: How do I do variable ordering?
 
 DONE
-
-
+	Write goal test function
+		Given a sat problem and a variable assignment, check to see whether that variable assignment solves the sat problem
