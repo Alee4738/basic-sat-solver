@@ -12,9 +12,7 @@ DOING:
 
 TODO:
 	Eliminate the double backtrack
-	Inference function to deduce the value
-		this is about modeling the domain of a function
-		inference(assignment constraints)
+
 	Forward checking
 
 
@@ -32,6 +30,9 @@ DONE
 		1. most constraining variable (most constrained variable does not apply because it goes into inference)
 		This is about the number of connections it has
 		how many clauses this guy is involved in!
+	Inference function to deduce the value
+		this is about modeling the domain of a function
+		inference(assignment constraints)
 
 
 Scratch work thinking:
