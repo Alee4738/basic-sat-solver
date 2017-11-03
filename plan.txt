@@ -3,14 +3,18 @@ CS 161 HW 4 Plan
 
 
 DOING:
-	
+	Eliminate the double backtrack
+	Inference function to deduce the value
+		this is about modeling the domain of a function
+		inference(assignment constraints)
 
 
 
 TODO:
-
+	Eliminate the double backtrack
 	Inference function to deduce the value
 		this is about modeling the domain of a function
+		inference(assignment constraints)
 	Forward checking
 
 

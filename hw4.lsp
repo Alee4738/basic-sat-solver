@@ -45,6 +45,22 @@
   );end defun
 
 
+;
+; undefinedVars
+; @param constraint - a list of integers for a constraint
+; @param assignment - a list of integers for a variable assignment
+; @return list of variables of constraint not defined in assignment
+(defun undefinedVars (constraint assignment)
+  (if (null constraint) nil
+    (if (or (>= (count (car constraint) assignment) 1) 
+        (>= (count (flipSign (car constraint)) assignment) 1))
+      (undefinedVars (cdr constraint) assignment)
+      (cons (car constraint) (undefinedVars (cdr constraint) assignment))
+      );end if
+    );end if
+  );end defun
+
+
 ; 
 ; no-conflicts (constraints assignment)
 ; @param constraints - list of constraints
@@ -126,6 +142,20 @@
     );end if
   );end defun
 
+; 
+; getArcs (num constraints)
+; @param num - integer to look for
+; @param constraints - a list of lists of integers (positive and negative)
+; @return list of lists of integers, the ones that contain num or -num
+(defun getArcs (num constraints)
+  (if (null constraints) nil
+    (if (or (>= (count num (car constraints)) 1) 
+            (>= (count (flipSign num) (car constraints)) 1))
+      (cons (car constraints) (getArcs num (cdr constraints)))
+      (getArcs num (cdr constraints))
+      );end if
+    );end if
+  );end defun
 
 ;
 ; select-unassigned variable helper
@@ -134,10 +164,7 @@
 ; @param constraints - a list of lists of integers (positive and negative)
 ; @return integer, the number of times num or -num appears in constraints
 (defun numArcs (num constraints)
-  (if (null constraints) 0
-    (+ (count num (car constraints)) (count (flipSign num) (car constraints))
-      (numArcs num (cdr constraints)))
-    );end if
+  (length (getArcs num constraints))
   );end defun
 
 
@@ -202,6 +229,41 @@
   );end defun
 
 
+; 
+; infer-single-run (assignment constraint)
+; only operates on constraints that are 1 variable away from being false
+(defun infer-single-run (assignment constraints)
+  (if (null constraints) assignment
+    (let* ((udvars (undefinedVars (car constraints) assignment)))
+      (if (and (= (length udvars) 1) (not (pass-constraint (car constraints) assignment)))
+        (if (pass-constraint (car constraints) (cons (car udvars) assignment))
+          (infer-single-run (cons (car udvars) assignment) (cdr constraints))
+          (infer-single-run (cons (flipSign (car udvars)) assignment) (cdr constraints))
+          );end if
+        (infer-single-run assignment (cdr constraints))
+        );end if
+      );end let
+    );end if
+  );end defun
+
+
+; backtrack helper
+; inference (assignment constraints)
+; @param assignment - list of integers for current assignment
+; @param constraints - list of lists of integers
+; @return list of integers, assignment, including new variable values deduced from constraints
+; logic: looking for constraints that are one variable away from being false
+; that variable's value must then be such to make the constraint true
+(defun inference (assignment constraints)
+  (let* ((result (infer-single-run assignment constraints)))
+    (if (equal result assignment) assignment
+      (inference result constraints)
+      );end if
+    );end let
+  );end defun
+
+
+
 
 ;
 ; CAN IMPROVE
@@ -213,14 +275,17 @@
   ; base case
   (if (complete-assignment assignment csp) assignment
     ; inductive case
-    (let* ((var (select-unassigned-variable assignment csp)) (notVar (flipSign var)))
+    (let* ((var (select-unassigned-variable assignment csp)) (notVar (flipSign var))
+      (constraints (cadr csp))
+      (nextAssign (inference (cons var assignment) constraints))
+      (nextAssignNot (inference (cons notVar assignment) constraints)))
       (cond
         ; positive
-        ((and (no-conflicts (cadr csp) (cons var assignment))
-          (backtrack (cons var assignment) csp)) (backtrack (cons var assignment) csp))
+        ((and (no-conflicts constraints nextAssign) (backtrack nextAssign csp))
+          (backtrack nextAssign csp))
         ; negative
-        ((and (no-conflicts (cadr csp) (cons notVar assignment))
-          (backtrack (cons notVar assignment) csp)) (backtrack (cons notVar assignment) csp))
+        ((and (no-conflicts constraints nextAssignNot) (backtrack nextAssignNot csp))
+          (backtrack nextAssignNot csp))
         (t nil); no solution works, backtrack
         );end cond
       );end let
