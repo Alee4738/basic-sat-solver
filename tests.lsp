@@ -42,11 +42,12 @@
 
 
 ; select-unassigned-variable (assignment csp)
-; for now, just goes in numerical order
+; most constraining variable
 (assert (equal 1 (select-unassigned-variable '() '(3 ((1) (-2 -3) (1 2 3))))))
 (assert (equal 2 (select-unassigned-variable '(1) '(3 ((1) (-2 -3) (1 2 3))))))
 (assert (equal 3 (select-unassigned-variable '(1 -2) '(3 ((1) (-2 -3) (1 2 3))))))
-(assert (equal nil (select-unassigned-variable '(1 -2 3) '(3 ((1) (-2 -3) (1 2 3))))))
+(assert (equal 3 (select-unassigned-variable '(1) '(3 ((1) (-2 -3) (1 2 3) (3) (3) (3) (3))))))
+(assert (equal 0 (select-unassigned-variable '(1 -2 3) '(3 ((1) (-2 -3) (1 2 3))))))
 (print "select-unassigned-variable passed!")
 
 

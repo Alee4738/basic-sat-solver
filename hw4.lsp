@@ -9,6 +9,11 @@
 ;; Class: CS 161 Aritficial Intelligence
 
 
+
+
+
+
+
 ; 
 ; pass-constraint (constraint assignment)
 ; @param constraint - a single constraint (a list of integers)
@@ -122,13 +127,68 @@
   );end defun
 
 
+;
+; select-unassigned variable helper
+; numArcs (num constraints)
+; @param num - integer to look for
+; @param constraints - a list of lists of integers (positive and negative)
+; @return integer, the number of times num or -num appears in constraints
+(defun numArcs (num constraints)
+  (if (null constraints) 0
+    (+ (count num (car constraints)) (count (flipSign num) (car constraints))
+      (numArcs num (cdr constraints)))
+    );end if
+  );end defun
+
+
+; maxArcs (nums constraints)
+; @param nums - list of integers to check
+; @param constraints - list of lists of integers
+; @param maxNum - current number that has the max instances
+; @param maxValue - the number of times currNum or -currNum appears in constraints
+; @return integer that appears in most constraints (positive and negative version)
+; if there is a tie, chooses the first number that appeared in nums
+(defun maxArcs (nums constraints maxNum maxValue)
+  ; Base case: nums ran out
+  (if (null nums) maxNum
+    (let* ((currNum (car nums)) (currValue (numArcs currNum constraints)))
+      (if (> currValue maxValue)
+        (maxArcs (cdr nums) constraints currNum currValue)
+        (maxArcs (cdr nums) constraints maxNum maxValue)
+        );end if
+      );end let
+    );end if
+  );end defun
+
+
+; select-unassigned-variable helper
+; listSubtract (l1 l2)
+; @param l1 - list 1, list of integers
+; @param l2 - list 2, list of integers
+; @return list of integers that are in l1 and not in l2 
+;   if x is in l2, then -x will be taken out of l1
+(defun listSubtract (l1 l2)
+  (if (null l1) nil
+    (let* ((currNum (car l1)))
+      (if (or (>= (count currNum l2) 1) (>= (count (flipSign currNum) l2) 1))
+        (listSubtract (cdr l1) l2)
+        (cons (car l1) (listSubtract (cdr l1) l2))
+        );end if
+      );end let
+    );end if
+  );end defun
+
+; CAN IMPROVE
 ; backtrack helper
 ; select-unassigned-variable (assignment csp)
 ; @param assignment - a list of integers (variable assignment)
 ; @param csp - CNF
 ; @return a (positive) integer not yet assigned in assignment
+;   if all variables are assigned, return 0
+; strategy: most constraining variable - the variable in the most number of clauses
+; implementation: maintain the max variable and max count
 (defun select-unassigned-variable (assignment csp)
-  (nextUnassigned assignment (listFromTo 1 (car csp)))
+  (maxArcs (listSubtract (listFromTo 1 (car csp)) assignment) (cadr csp) 0 0)
   );end defun
 
 
@@ -143,14 +203,15 @@
 
 
 
-; 
+;
+; CAN IMPROVE
 ; backtrack (assignment csp)
 ; @param assignment - a variable assignment
 ; @param csp - CNF
 ; @return a solution to the csp if one exists, starts by looking at assignment
 (defun backtrack (assignment csp)
   ; base case
-  (if (goal-test csp assignment) assignment
+  (if (complete-assignment assignment csp) assignment
     ; inductive case
     (let* ((var (select-unassigned-variable assignment csp)) (notVar (flipSign var)))
       (cond

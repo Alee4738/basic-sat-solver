@@ -3,30 +3,32 @@ CS 161 HW 4 Plan
 
 
 DOING:
-	Make test cases
+	
 
 
 
 TODO:
-	a state is a list of variable assignments!
-	variables: x1 x2 ... xn
-	domain: {t, f}, negative or positive
-	constraints: constraints
 
-	the notion of an initial state: 
-		empty variable assignment should not 
-
+	Inference function to deduce the value
+		this is about modeling the domain of a function
+	Forward checking
 
 
 	We have 2 options: search, infer
 	Goal method:
-		Backtracking search using Most constrained variable and forward checking and variable ordering
+		using Most constrained variable and forward checking
 		TODO: How do I do variable ordering?
 
 DONE
 	Write goal test function
 		Given a sat problem and a variable assignment, check to see whether that variable assignment solves the sat problem
+	Make test cases
+	Implement basic backtracking search
+	select-unasssigned-variable: 
+		1. most constraining variable (most constrained variable does not apply because it goes into inference)
+		This is about the number of connections it has
+		how many clauses this guy is involved in!
 
 
 Scratch work thinking:
-	failing a constraint is currently the same as not having any variables that the constraint defines
+	
