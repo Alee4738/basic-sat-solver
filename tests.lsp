@@ -2,10 +2,8 @@
 ;; Author: Andrew Lee
 ;; Class: CS 161 Aritficial Intelligence
 
-(defun reload()
-  (and (load "parse_cnf.lsp") (load "hw4.lsp"))
-  );end defun
-
+(load "parse_cnf.lsp")
+(load "hw4.lsp")
 
 ; one-constraint (constraint assignment)
 (assert (equal t (pass-constraint '(1 2 3) '(1 -2 -3))))
@@ -52,5 +50,22 @@
 (print "select-unassigned-variable passed!")
 
 
-
-
+; provided sat sets
+(print "solving provided sat sets")
+(assert (not (null (solve-cnf "cnfs/sat_0/cnf_10.cnf"))))
+(print "passed test (size 10)")
+(assert (not (null (solve-cnf "cnfs/sat/cnf_20.cnf"))))
+(print "passed test (size 20)")
+; (assert (not (null (solve-cnf "cnfs/sat_2/cnf_30.cnf"))))
+; (print "passed test (size 30)")
+; (assert (not (null (solve-cnf "cnfs/sat_1/cnf_50.cnf"))))
+; (print "passed test (size 50)")
+; (assert (equal nil (solve-cnf "cnfs/unsat/cnf_12.cnf")))
+; (print "passed test (size 12)")
+; (assert (equal nil (solve-cnf "cnfs/unsat/cnf_20.cnf")))
+; (print "passed test (size 20)")
+; (assert (equal nil (solve-cnf "cnfs/unsat_0/cnf_30.cnf")))
+; (print "passed test (size 30)")
+; (assert (equal nil (solve-cnf "cnfs/unsat/cnf_42.cnf")))
+; (print "passed test (size 42)")
+(print "all provided sat sets passed!")

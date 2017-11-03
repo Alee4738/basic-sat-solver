@@ -41,13 +41,13 @@
 
 
 ; 
-; no-conflicts (assignment constraints)
-; @param assignment - a list of integers (variable assignment)
+; no-conflicts (constraints assignment)
 ; @param constraints - list of constraints
+; @param assignment - a list of integers (variable assignment)
 ; @return t if, for each constraint, constraint is satisfied or
 ;   not all variables in constraint are defined, meaning could still be satisfied later
 ;   else nil
-(defun no-conflicts (assignment constraints)
+(defun no-conflicts (constraints assignment)
   (if (null constraints) t
     (and (or (pass-constraint (car constraints) assignment)
             (not (allDefined (car constraints) assignment)))
@@ -82,7 +82,6 @@
 
 
 ;; model for backtracking search provided in textbook
-
 
 ; 
 ; select-unassigned-variable helper
@@ -122,6 +121,7 @@
     );end if
   );end defun
 
+
 ; backtrack helper
 ; select-unassigned-variable (assignment csp)
 ; @param assignment - a list of integers (variable assignment)
@@ -143,40 +143,28 @@
 
 
 
-
-
 ; 
 ; backtrack (assignment csp)
-; 
+; @param assignment - a variable assignment
+; @param csp - CNF
+; @return a solution to the csp if one exists, starts by looking at assignment
 (defun backtrack (assignment csp)
   ; base case
-  (if (complete-assignment assignment csp) assignment
-
-  ; inductive case
-    (let* ((var (select-unassigned-variable assignment csp)))
+  (if (goal-test csp assignment) assignment
+    ; inductive case
+    (let* ((var (select-unassigned-variable assignment csp)) (notVar (flipSign var)))
       (cond
-        ; positive 
-        ((no-conflicts (cons var assignment) csp)
-          ; TODO
-          )
+        ; positive
+        ((and (no-conflicts (cadr csp) (cons var assignment))
+          (backtrack (cons var assignment) csp)) (backtrack (cons var assignment) csp))
         ; negative
-        ((no-conflicts (cons (flipSign var) assignment) csp)
-          ; TODO
-          )
-        (t nil); cannot go down, backtrack you fool!
+        ((and (no-conflicts (cadr csp) (cons notVar assignment))
+          (backtrack (cons notVar assignment) csp)) (backtrack (cons notVar assignment) csp))
+        (t nil); no solution works, backtrack
         );end cond
       );end let
     );end if
   );end defun
-
-
-
-; functions to implement
-
-
-
-
-
 
 
 
@@ -189,4 +177,3 @@
 (defun sat? (n delta)
   (backtrack '() (list n delta))
   );end defun
-
