@@ -26,3 +26,7 @@ TODO:
 DONE
 	Write goal test function
 		Given a sat problem and a variable assignment, check to see whether that variable assignment solves the sat problem
+
+
+Scratch work thinking:
+	failing a constraint is currently the same as not having any variables that the constraint defines

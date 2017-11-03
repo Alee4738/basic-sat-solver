@@ -9,31 +9,63 @@
 ;; Class: CS 161 Aritficial Intelligence
 
 
-; goal-test helper
-; one-constraint (constraint assignment)
+; 
+; pass-constraint (constraint assignment)
 ; @param constraint - a single constraint (a list of integers)
 ; @param assignment - a variable assignment
 ; return t if the assignment satisfies that constraint, else nil
 ; logic: basically the member function on each of the elements of constraint
-(defun one-constraint (constraint assignment)
+(defun pass-constraint (constraint assignment)
   (if (null constraint) nil
     ; return t if first member of constraint is in assignment
     ; or if another member of constraint is in assignment
     (or (>= (count (car constraint) assignment) 1)
-      (one-constraint (cdr constraint) assignment));end or
+      (pass-constraint (cdr constraint) assignment));end or
+    );end if
+  );end defun
+
+; 
+; allDefined (constraint assignment)
+; @param constraint - a list of integers for a constraint
+; @param assignment - a list of integers for a variable assignment
+; @return t if all variables in constraint are defined, else nil
+;   constraint being nil returns t
+(defun allDefined (constraint assignment)
+  (if (null constraint) t
+    (and 
+      (or (>= (count (car constraint) assignment) 1) 
+          (>= (count (flipSign (car constraint)) assignment) 1))
+      (allDefined (cdr constraint) assignment))
     );end if
   );end defun
 
 
+; 
+; no-conflicts (assignment constraints)
+; @param assignment - a list of integers (variable assignment)
+; @param constraints - list of constraints
+; @return t if, for each constraint, constraint is satisfied or
+;   not all variables in constraint are defined, meaning could still be satisfied later
+;   else nil
+(defun no-conflicts (assignment constraints)
+  (if (null constraints) t
+    (and (or (pass-constraint (car constraints) assignment)
+            (not (allDefined (car constraints) assignment)))
+      (no-conflicts (cdr constraints) assignment))
+    );end if
+  );end defun
+
+
+
 ; goal-test helper
-; test-constraints (constraints assignment)
+; pass-all-constraints (constraints assignment)
 ; @param constraints - list of constraints
 ; @assignment - a variable assignment
 ; @return t if assignment satisfies all constraints or if constraints nil, else nil
-(defun test-constraints (constraints assignment)
+(defun pass-all-constraints (constraints assignment)
   (if (null constraints) t
-    (and (one-constraint (car constraints) assignment)
-      (test-constraints (cdr constraints) assignment))
+    (and (pass-constraint (car constraints) assignment)
+      (pass-all-constraints (cdr constraints) assignment))
     );end if
   );end defun
 
@@ -44,7 +76,7 @@
 ; @param assignment - a variable assignment (list of variables) in any order
 ; @return t if assignment solves the sat problem, else nil
 (defun goal-test (problem assignment)
-  (test-constraints (cadr problem) assignment)
+  (pass-all-constraints (cadr problem) assignment)
   );end defun
 
 
@@ -52,6 +84,7 @@
 ;; model for backtracking search provided in textbook
 
 
+; 
 ; select-unassigned-variable helper
 ; listFromTo (start end)
 ; @param start - integer for the first number in list
@@ -65,16 +98,22 @@
     );end cond
   );end defun
 
+
+; 
+; flipSign (num)
+; @param num - an integer
+; @return the reverse sign of num
 (defun flipSign (num)
   (* -1 num)
   );end defun
+
 
 ; select-unasssigned-variable helper
 ; nextUnassigned (assignment allNums)
 ; @param assignment - a list of integers (variable assignment)
 ; @param allNums - a list of positive integers (all the integers that should be assigned)
 ; @return an integer not yet assigned in assignment
-;   else if all integers were assigned, nil
+;   else if all integers were assignedse, nil
 (defun nextUnassigned (assignment allNums)
   (if (null allNums) nil
     (if (and (= (count (car allNums) assignment) 0)
@@ -102,17 +141,30 @@
   (= (length assignment) (car csp))
   );end defun
 
+
+
+
+
 ; 
 ; backtrack (assignment csp)
+; 
 (defun backtrack (assignment csp)
+  ; base case
   (if (complete-assignment assignment csp) assignment
+
+  ; inductive case
     (let* ((var (select-unassigned-variable assignment csp)))
-      ; try positive first, then negative
-      (cons var assignment)
-      (cons (flipSign var) assignment)
-
-
-
+      (cond
+        ; positive 
+        ((no-conflicts (cons var assignment) csp)
+          ; TODO
+          )
+        ; negative
+        ((no-conflicts (cons (flipSign var) assignment) csp)
+          ; TODO
+          )
+        (t nil); cannot go down, backtrack you fool!
+        );end cond
       );end let
     );end if
   );end defun
