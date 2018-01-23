@@ -1,4 +1,4 @@
-# cs161-sat
+# basic-sat-solver
 A SAT solver using backtracking and other optimization techniques.
 This project was done for the UCLA course CS 161: Foundations of Artificial Intellgience.
 
